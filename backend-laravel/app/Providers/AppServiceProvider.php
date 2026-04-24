@@ -7,14 +7,10 @@ use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
     public function boot(): void
     {
-        // Forcer HTTPS en production (Railway utilise un reverse proxy)
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }

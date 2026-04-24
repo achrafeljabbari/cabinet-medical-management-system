@@ -16,8 +16,8 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chmod -R 775 storage bootstrap/cache
 
-# IMPORTANT
-RUN mkdir -p database && touch database/database.sqlite
+# ❌ SUPPRIMÉ (plus besoin de sqlite)
+# RUN mkdir -p database && touch database/database.sqlite
 
 RUN php artisan storage:link
 
@@ -25,12 +25,12 @@ ENV APP_ENV=production
 ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 ENV APP_DEBUG=false
 
-# ⚠️ CHANGE ICI si tu passes à MySQL
-ENV DB_CONNECTION=sqlite
+# ❌ SUPPRIMÉ → Railway va injecter MySQL
+# ENV DB_CONNECTION=sqlite
 
+# ⚠️ IMPORTANT → PAS de route:cache ici
 RUN php artisan config:clear && \
     php artisan config:cache && \
-    php artisan route:cache && \
     php artisan view:cache
 
 EXPOSE 8080

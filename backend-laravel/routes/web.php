@@ -97,7 +97,7 @@ Route::name('web.')->group(function () {
         /*
         | Notifications
         */
-        Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::prefix('notifications')->name('web.notifications.')->group(function () {
             Route::get('/', [NotificationController::class, 'index'])->name('index');
             Route::put('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
             Route::put('/mark-all-read', [NotificationController::class, 'markAllRead'])->name('markAllRead');

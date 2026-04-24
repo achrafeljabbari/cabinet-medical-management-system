@@ -33,10 +33,9 @@ ENV APP_ENV=production
 ENV FORCE_HTTPS=true
 
 # Clean and Cache
-# Maintenant que les conflits de noms de routes et les closures sont résolus, 
-# on peut réactiver le cache des routes en toute sécurité.
+# On affiche la liste des routes pour débugger en cas d'erreur de cache
 RUN php artisan config:clear && \
-    php artisan route:cache && \
+    php artisan route:list && \
     php artisan view:cache
 
 # Expose port

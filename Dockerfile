@@ -21,8 +21,8 @@ RUN composer install
 RUN chmod -R 775 storage bootstrap/cache
 
 # Config Apache pour Laravel
-RUN a2dismod mpm_prefork mpm_event 2>/dev/null || true
-RUN a2enmod rewrite
+RUN a2dismod mpm_event 2>/dev/null || true
+RUN a2enmod mpm_prefork rewrite
 RUN sed -i 's!/var/www/html!/var/www/html/backend-laravel/public!g' /etc/apache2/sites-available/000-default.conf
 
 # Exposer port

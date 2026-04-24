@@ -1,9 +1,9 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Installer dépendances système
 RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip git curl \
-    && docker-php-ext-install pdo pdo_mysql zip
+    libzip-dev zip unzip git curl libonig-dev libcurl4-openssl-dev \
+    && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

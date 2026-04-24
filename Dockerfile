@@ -16,12 +16,17 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chmod -R 775 storage bootstrap/cache
 
+# IMPORTANT
+RUN mkdir -p database && touch database/database.sqlite
+
+RUN php artisan storage:link
+
 ENV APP_ENV=production
 ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 ENV APP_DEBUG=false
-ENV DB_CONNECTION=sqlite
 
-RUN touch database/database.sqlite
+# ⚠️ CHANGE ICI si tu passes à MySQL
+ENV DB_CONNECTION=sqlite
 
 RUN php artisan config:clear && \
     php artisan config:cache && \
@@ -30,5 +35,4 @@ RUN php artisan config:clear && \
 
 EXPOSE 8080
 
-# migrate au démarrage, pas au build
-CMD php artisan migrate --force && php -S 0.0.0.0:8080 -t public
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080

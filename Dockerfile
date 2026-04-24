@@ -1,4 +1,4 @@
-FROM php:8.4.7-apache
+FROM php:8.4.7-cli
 
 # Forcer mise à jour apt pour éviter le cache
 RUN apt-get update && apt-get install -y \
@@ -15,17 +15,13 @@ COPY . /var/www/html
 WORKDIR /var/www/html/backend-laravel
 
 # Installer dépendances Laravel
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader
 
 # Permissions Laravel
 RUN chmod -R 775 storage bootstrap/cache
 
-# Config Apache pour Laravel
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf
-RUN cp /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
-RUN cp /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ 2>/dev/null || true
-RUN a2enmod rewrite
-RUN sed -i 's!/var/www/html!/var/www/html/backend-laravel/public!g' /etc/apache2/sites-available/000-default.conf
-
 # Exposer port
-EXPOSE 80
+EXPOSE 8080
+
+# Démarrer PHP built-in server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]

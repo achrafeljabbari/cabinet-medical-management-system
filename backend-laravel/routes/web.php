@@ -35,6 +35,11 @@ Route::controller(FrontendPageController::class)->group(function () {
 Route::redirect('/login', '/connexion');
 Route::redirect('/register', '/inscription');
 
+// Health check route for Railway
+Route::get('/up', function () {
+    return response()->noContent();
+});
+
 Route::prefix('doctor')->name('doctor.')->controller(FrontendPageController::class)->group(function () {
     Route::get('/dashboard', 'doctorDashboard')->defaults('initialView', 'dashboard')->name('dashboard');
     Route::get('/consultations', 'doctorDashboard')->defaults('initialView', 'consultations')->name('consultations');

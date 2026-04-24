@@ -11,6 +11,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copier le projet
 COPY . /var/www/html
 
+# Supprimer les fichiers de cache pour éviter les anciennes configurations
+RUN rm -rf /var/www/html/backend-laravel/bootstrap/cache/*.php
+
 # Définir le bon dossier Laravel
 WORKDIR /var/www/html/backend-laravel
 

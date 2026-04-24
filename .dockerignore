@@ -1,5 +1,8 @@
 node_modules
 vendor
 .env
+.env.*
 .git
 .gitignore
+bootstrap/cache/*.php
+bootstrap/cache/.*

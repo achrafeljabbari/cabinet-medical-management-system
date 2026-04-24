@@ -69,7 +69,14 @@ Au lieu de taper l'hôte et le mot de passe manuellement, Railway permet de fair
 
 ---
 
-## Étape 6 : Comment corriger si ça ne marche pas ?
+## Étape 6 : Résoudre l'erreur "Healthcheck failed"
+
+Si Railway affiche que le Healthcheck a échoué :
+1.  **Vérifiez les "Deploy Logs"** : Si vous voyez une erreur comme `Access denied for user...` ou `Connection refused`, c'est que votre base de données MySQL n'est pas bien connectée ou que vos variables `DB_...` sont fausses.
+2.  **Vérifiez l'APP_KEY** : Sans elle, le site renvoie une erreur 500 sur toutes les pages, y compris `/up`, ce qui fait échouer le test de santé.
+3.  **Port** : J'ai mis à jour le Dockerfile pour utiliser `${PORT}`, ce qui devrait régler le problème de connexion.
+
+## Étape 7 : Comment corriger si ça ne marche pas ?
 
 - **Erreur 500** : Allez dans l'onglet **Variables**, changez `APP_DEBUG` à `true`. Rechargez votre site. Laravel vous dira exactement quel fichier ou quelle ligne pose problème.
 - **CSS non chargé** : Vérifiez que vous avez bien mis `FORCE_HTTPS=true` dans les variables.

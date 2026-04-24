@@ -33,13 +33,15 @@ ENV APP_ENV=production
 ENV FORCE_HTTPS=true
 
 # Clean and Cache
-# On affiche la liste des routes pour débugger en cas d'erreur de cache
 RUN php artisan config:clear && \
-    php artisan route:list && \
     php artisan view:cache
 
-# Expose port
+# On ne fait pas route:cache ici par sécurité pour le premier démarrage réussi
+# On pourra le réactiver plus tard.
+
+# Expose port (informatif)
 EXPOSE 8080
 
-# Start command
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
+# Start command : On utilise la variable $PORT de Railway
+# On ajoute une petite attente pour MySQL si nécessaire
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}

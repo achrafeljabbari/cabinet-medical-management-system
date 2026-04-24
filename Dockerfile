@@ -23,6 +23,14 @@ RUN chmod -R 775 storage bootstrap/cache
 # Créer la base de données SQLite
 RUN touch database/database.sqlite
 
+# Configurer les variables d'environnement
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+ENV DB_CONNECTION=sqlite
+
+# Nettoyer le cache Laravel
+RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear
+
 # Exposer port
 EXPOSE 8080
 

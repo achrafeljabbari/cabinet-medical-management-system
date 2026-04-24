@@ -26,7 +26,7 @@ RUN touch database/database.sqlite
 
 # Configurer les variables d'environnement AVANT les commandes artisan
 ENV APP_ENV=production
-ENV APP_DEBUG=false
+ENV APP_DEBUG=true
 ENV DB_CONNECTION=sqlite
 ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 
@@ -34,6 +34,8 @@ ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 RUN php artisan migrate --force
 
 # Optimiser pour la production (sans route:cache à cause de noms de routes en double)
+RUN php artisan config:clear
+RUN php artisan view:clear
 RUN php artisan config:cache
 RUN php artisan view:cache
 

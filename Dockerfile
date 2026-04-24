@@ -1,8 +1,9 @@
 FROM php:8.4.7-cli
 
-# Installer les dépendances système nécessaires
+# Installer les dépendances système nécessaires (y compris SQLite pour pdo_sqlite)
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libonig-dev libcurl4-openssl-dev \
+    libsqlite3-dev \
     && docker-php-ext-install pdo pdo_sqlite pdo_mysql zip mbstring exif pcntl bcmath
 
 # Installer Composer

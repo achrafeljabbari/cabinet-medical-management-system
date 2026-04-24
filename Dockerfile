@@ -1,6 +1,6 @@
-FROM php:8.4-apache
+FROM php:8.4.7-apache
 
-# Installer dépendances système
+# Forcer mise à jour apt pour éviter le cache
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libonig-dev libcurl4-openssl-dev \
     && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath

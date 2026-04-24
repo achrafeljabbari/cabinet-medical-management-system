@@ -29,15 +29,18 @@ RUN chmod -R 775 storage bootstrap/cache
 # Create storage link
 RUN php artisan storage:link
 
-# Clean and Cache configuration/routes/views
-# Note: config:cache is often better done at runtime in Railway to pick up environment variables,
-# but if you have all vars set during build it's fine. 
-# Here we just clear them to be safe, or cache only routes and views.
-RUN php artisan route:cache && \
+ENV APP_ENV=production
+ENV FORCE_HTTPS=true
+
+# Clean and Cache
+# Maintenant que les conflits de noms de routes et les closures sont résolus, 
+# on peut réactiver le cache des routes en toute sécurité.
+RUN php artisan config:clear && \
+    php artisan route:cache && \
     php artisan view:cache
 
 # Expose port
 EXPOSE 8080
 
-# Start command: migrate and serve
+# Start command
 CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080

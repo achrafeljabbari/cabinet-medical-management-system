@@ -1,62 +1,42 @@
 # Guide de Déploiement — Medicare sur Railway
 
-Ce document détaille les étapes pour déployer l'application Medicare (Laravel + Vite) sur Railway.
+## 1. Pourquoi l'erreur 500 et l'échec du build ?
 
-## 1. Prérequis sur Railway
+1.  **Conflit de noms de routes** : L'erreur `notifications.index` arrivait car les routes API et Web utilisaient les mêmes noms. J'ai préfixé toutes les routes API par `api.` (ex: `api.notifications.index`).
+2.  **APP_KEY manquante** : L'erreur 500 sur le site live est presque toujours due à l'absence de la variable `APP_KEY` dans l'interface de Railway.
 
-1. **Compte Railway** : Connectez votre compte GitHub.
-2. **Base de données MySQL** : 
-   - Créez un service MySQL sur Railway.
-   - Railway injectera automatiquement les variables `MYSQL_URL` ou `DATABASE_URL`. Laravel utilisera `DB_URL` pour se connecter.
-3. **Variables d'environnement** :
-   Configurez les variables suivantes dans l'onglet **Variables** de votre service Web :
-   - `APP_KEY` : Générée via `php artisan key:generate --show` (obligatoire).
-   - `APP_ENV` : `production`
-   - `APP_DEBUG` : `false`
-   - `APP_URL` : L'URL fournie par Railway (ex: `https://medicare-production.up.railway.app`).
-   - `SESSION_DRIVER` : `database`
-   - `DB_CONNECTION` : `mysql`
-   - `SESSION_SECURE_COOKIE` : `true`
+## 2. Actions à faire pour corriger (CÔTÉ RAILWAY)
 
-## 2. Audit et Corrections Apportées
+Allez dans votre projet sur Railway, onglet **Variables**, et ajoutez/vérifiez :
 
-Avant le déploiement, les corrections suivantes ont été effectuées :
-- **Suppression des Closures dans les routes** : La route `/api/user` utilisait une closure, ce qui bloquait `php artisan route:cache`. Elle a été déplacée dans `AuthController@user`.
-- **Nettoyage de `env()`** : Vérification qu'aucune fonction `env()` n'est utilisée en dehors des fichiers de configuration.
-- **Optimisation du Dockerfile** : 
-  - Ajout du build des assets (Vite) lors de la construction de l'image.
-  - Activation du cache des routes et des vues.
-  - Installation automatique de Node.js et Composer.
-- **Mise à jour de `.env.example`** : Ajout des variables nécessaires pour la production.
+- **`APP_KEY`** : (Obligatoire) Exécutez `php artisan key:generate --show` localement et copiez la valeur (ex: `base64:xxxx...`).
+- **`APP_DEBUG`** : Mettez à `true` temporairement pour voir l'erreur exacte au lieu de "500 Server Error", puis remettez à `false` une fois corrigé.
+- **`DB_CONNECTION`** : `mysql`
+- **`DATABASE_URL`** : Railway l'injecte souvent tout seul si vous avez lié un service MySQL. Sinon, utilisez les variables `MYSQLHOST`, `MYSQLUSER`, etc.
+- **`FORCE_HTTPS`** : Mettez à `true` dans les variables Railway pour garantir que tous les liens (CSS/JS) utilisent HTTPS.
 
-## 3. Commandes de Déploiement
+## 3. Sécurisation des Assets (HTTPS)
 
-### Option A : Déploiement via GitHub (Recommandé)
-1. Commitez les changements :
-   ```bash
-   git add .
-   git commit -m "Fix: preparation pour le déploiement Railway"
-   git push origin main
-   ```
-2. Railway détectera le `Dockerfile` à la racine et lancera le build automatiquement.
+Pour garantir que le frontend (CSS/JS) fonctionne sans erreur de "Mixed Content" :
+1.  **Forçage HTTPS** : J'ai ajouté une règle dans `AppServiceProvider.php` qui force tous les liens à utiliser `https://` quand l'application est en production.
+2.  **Configuration Vite** : Le build génère les assets correctement, et Laravel les servira via HTTPS grâce à la règle ci-dessus.
 
-### Option B : Railway CLI
-```bash
-railway up
-```
+## 4. Étapes pour redéployer
 
-## 4. Vérifications Post-Déploiement
+1.  **Commit et Push** :
+    ```bash
+    git add .
+    git commit -m "Fix: route naming conflict and update Dockerfile"
+    git push origin main
+    ```
+2.  **Surveillance** : Regardez les **Build Logs** sur Railway. Le build devrait passer maintenant car j'ai assoupli le Dockerfile.
+3.  **Logs de déploiement** : Si le site affiche toujours 500, allez dans l'onglet **Logs** (Deploy Logs) sur Railway. Vous verrez l'erreur PHP exacte (ex: "Database connection refused" ou "Permission denied").
 
-1. **Migrations** : La commande `php artisan migrate --force` est exécutée automatiquement au démarrage du container.
-2. **Logs** : Consultez l'onglet **Logs** sur Railway pour vérifier qu'il n'y a pas d'erreurs 500 au démarrage.
-3. **Health Check** : L'application expose un endpoint `/up` pour que Railway vérifie la santé du service.
+## 4. Corrections effectuées dans le code
 
-## 5. Solutions aux Erreurs Courantes
-
-- **Erreur 500 (Missing APP_KEY)** : Assurez-vous d'avoir copié la clé `APP_KEY` dans les variables Railway.
-- **Vite Manifest Not Found** : Le Dockerfile exécute `npm run build`, ce qui génère le manifest dans `public/build`. Si l'erreur persiste, vérifiez que `public/build` n'est pas écrasé par un volume.
-- **Database Connection Failed** : Vérifiez que le service MySQL est bien lié (Reference) au service Web ou que `DATABASE_URL` est correctement injecté.
-- **Mixed Content (HTTPS)** : Laravel détecte automatiquement le proxy de Railway, mais si les assets se chargent en HTTP, ajoutez `FORCE_HTTPS=true` aux variables d'environnement.
+-   **Routes API** : Toutes les routes dans `api.php` sont maintenant nommées `api.xxx` pour éviter les collisions avec `web.php`.
+-   **Dockerfile** : Suppression temporaire de `route:cache` pour garantir que le build se termine. L'optimisation pourra être remise plus tard.
+-   **AuthController** : Suppression des closures pour compatibilité avec le cache Laravel.
 
 ---
-*Préparé par Gemini CLI - Avril 2026*
+*Si vous voyez toujours une erreur 500, vérifiez bien que votre base de données MySQL sur Railway est active et que l'utilisateur a les droits.*

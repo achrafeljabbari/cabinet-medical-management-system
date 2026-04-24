@@ -23,16 +23,16 @@ RUN chmod -R 775 storage bootstrap/cache
 # Créer la base de données SQLite
 RUN touch database/database.sqlite
 
+# Exécuter les migrations
+RUN php artisan migrate --force
+
 # Configurer les variables d'environnement
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV DB_CONNECTION=sqlite
 
-# Nettoyer le cache Laravel
-RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear
-
 # Exposer port
 EXPOSE 8080
 
 # Démarrer PHP built-in server
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
+CMD php artisan serve --host=0.0.0.0 --port=8080

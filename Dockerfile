@@ -20,9 +20,11 @@ RUN composer install
 # Permissions Laravel
 RUN chmod -R 775 storage bootstrap/cache
 
-# Config Apache pour Laravel - Supprimer tous les MPM et activer uniquement prefork
+# Config Apache pour Laravel
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf
-RUN a2enmod mpm_prefork rewrite
+RUN cp /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
+RUN cp /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ 2>/dev/null || true
+RUN a2enmod rewrite
 RUN sed -i 's!/var/www/html!/var/www/html/backend-laravel/public!g' /etc/apache2/sites-available/000-default.conf
 
 # Exposer port

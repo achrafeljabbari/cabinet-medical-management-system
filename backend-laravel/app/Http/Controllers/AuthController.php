@@ -106,4 +106,9 @@ class AuthController extends Controller
 
         return redirect('/')->with('success', 'Vous avez ete deconnecte.');
     }
+
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
 }

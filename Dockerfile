@@ -1,10 +1,9 @@
 FROM php:8.4.7-cli
 
-# Installer Node.js et npm
+# Installer les dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libonig-dev libcurl4-openssl-dev \
-    nodejs npm \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql zip mbstring exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -12,10 +11,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copier le projet
 COPY . /var/www/html
 
-# Définir le bon dossier Laravel
+# Définir le dossier Laravel
 WORKDIR /var/www/html/backend-laravel
 
-# Installer dépendances Laravel
+# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
 # Permissions Laravel
@@ -24,18 +23,21 @@ RUN chmod -R 775 storage bootstrap/cache
 # Créer la base de données SQLite
 RUN touch database/database.sqlite
 
-# Exécuter les migrations
-RUN php artisan migrate --force
-
-# Compiler les assets frontend (CSS/JS)
-RUN npm install && npm run build
-
-# Configurer les variables d'environnement
+# Configurer les variables d'environnement AVANT les commandes artisan
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV DB_CONNECTION=sqlite
+ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 
-# Exposer port
+# Exécuter les migrations
+RUN php artisan migrate --force
+
+# Optimiser pour la production
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
+
+# Exposer le port
 EXPOSE 8080
 
 # Démarrer PHP built-in server

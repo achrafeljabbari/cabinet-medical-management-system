@@ -32,6 +32,9 @@ ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 ENV APP_DEBUG=false
 ENV DB_CONNECTION=sqlite
 
+# Vider le cache de configuration
+RUN php artisan config:clear
+
 # Exposer port
 EXPOSE 8080
 

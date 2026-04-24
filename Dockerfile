@@ -1,8 +1,9 @@
 FROM php:8.4.7-cli
 
-# Forcer mise à jour apt pour éviter le cache
+# Installer Node.js et npm
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libonig-dev libcurl4-openssl-dev \
+    nodejs npm \
     && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath
 
 # Installer Composer
@@ -25,6 +26,9 @@ RUN touch database/database.sqlite
 
 # Exécuter les migrations
 RUN php artisan migrate --force
+
+# Compiler les assets frontend (CSS/JS)
+RUN npm install && npm run build
 
 # Configurer les variables d'environnement
 ENV APP_ENV=production

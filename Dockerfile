@@ -27,6 +27,7 @@ RUN touch database/database.sqlite
 # Configurer les variables d'environnement AVANT les commandes artisan
 ENV APP_ENV=production
 ENV APP_DEBUG=true
+ENV APP_KEY=base64:zoy27AXpOIdFluHzMt7IXDNgHXgbreCMwwlP67DyZ8s=
 ENV DB_CONNECTION=sqlite
 ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 

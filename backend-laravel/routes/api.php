@@ -135,10 +135,10 @@ Route::middleware('auth:sanctum')->group(function () {
      * Notification Management
      */
     Route::apiResource('notifications', NotificationController::class);
-    Route::get('/notifications/user/{user_id}', [NotificationController::class, 'getUserNotifications'])->name('notifications.user');
-    Route::get('/notifications/user/{user_id}/unread', [NotificationController::class, 'getUnread'])->name('notifications.unread');
-    Route::get('/notifications/user/{user_id}/stats', [NotificationController::class, 'getStats'])->name('notifications.stats');
-    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::put('/notifications/user/{user_id}/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    Route::delete('/notifications/user/{user_id}/clear', [NotificationController::class, 'clearUserNotifications'])->name('notifications.clear');
+    Route::get('/notifications/user/{user_id}', [NotificationController::class, 'getUserNotifications']);
+    Route::get('/notifications/user/{user_id}/unread', [NotificationController::class, 'getUnread']);
+    Route::get('/notifications/user/{user_id}/stats', [NotificationController::class, 'getStats']);
+    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::put('/notifications/user/{user_id}/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/user/{user_id}/clear', [NotificationController::class, 'clearUserNotifications']);
 });

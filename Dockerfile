@@ -33,9 +33,8 @@ ENV APP_URL=https://cabinet-medical-management-system-production.up.railway.app
 # Exécuter les migrations
 RUN php artisan migrate --force
 
-# Optimiser pour la production
+# Optimiser pour la production (sans route:cache à cause de noms de routes en double)
 RUN php artisan config:cache
-RUN php artisan route:cache
 RUN php artisan view:cache
 
 # Exposer le port
